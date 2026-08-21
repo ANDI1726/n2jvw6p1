@@ -1,0 +1,874 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Buku Catatan Jalur Pendakian</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --parchment:#EFE9DA;
+    --parchment-dark:#E1D8C1;
+    --card:#FBF8F1;
+    --pine:#1F3A2E;
+    --pine-light:#33553F;
+    --rust:#B5651D;
+    --rust-dark:#8F4E15;
+    --moss:#6E8B3D;
+    --moss-dark:#55702E;
+    --amber:#C9962B;
+    --amber-dark:#A87A1B;
+    --ink:#2A2621;
+    --ink-soft:#6B6252;
+    --error:#9C3B3B;
+    --line:#D6CBAF;
+    --radius:10px;
+    --shadow:0 2px 6px rgba(31,58,46,.08), 0 8px 24px rgba(31,58,46,.06);
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--parchment);
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    line-height:1.5;
+    min-height:100vh;
+  }
+
+  ::selection{background:var(--amber);color:var(--pine);}
+
+  /* ---------- Scrollbar (nature touch) ---------- */
+  ::-webkit-scrollbar{width:10px;}
+  ::-webkit-scrollbar-track{background:var(--parchment-dark);}
+  ::-webkit-scrollbar-thumb{background:var(--moss);border-radius:6px;}
+
+  a,button{font-family:inherit;}
+
+  .mono{font-family:'JetBrains Mono',monospace;}
+
+  /* ---------- Header ---------- */
+  header.hero{
+    position:relative;
+    background:var(--pine);
+    color:#F4EFE2;
+    padding:52px 24px 68px;
+    overflow:hidden;
+    isolation:isolate;
+  }
+  header.hero::before{
+    content:"";
+    position:absolute;inset:0;
+    background-image:
+      repeating-radial-gradient(circle at 15% 30%, transparent 0 26px, rgba(244,239,226,.045) 27px 28px),
+      repeating-radial-gradient(circle at 85% 75%, transparent 0 40px, rgba(244,239,226,.04) 41px 42px),
+      repeating-radial-gradient(circle at 50% 0%, transparent 0 60px, rgba(244,239,226,.035) 61px 62px);
+    z-index:0;
+  }
+  .hero-inner{
+    position:relative;z-index:1;
+    max-width:1080px;margin:0 auto;
+  }
+  .eyebrow{
+    display:inline-flex;align-items:center;gap:8px;
+    font-family:'JetBrains Mono',monospace;
+    font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;
+    color:#C7D9C9;
+    margin-bottom:14px;
+  }
+  .eyebrow .dot{width:6px;height:6px;border-radius:50%;background:var(--amber);}
+  h1.title{
+    font-family:'Fraunces',serif;
+    font-optical-sizing:auto;
+    font-weight:600;
+    font-size:clamp(2rem, 4.4vw, 3.1rem);
+    margin:0 0 10px;
+    letter-spacing:-.01em;
+  }
+  .subtitle{
+    max-width:560px;
+    color:#D6E2D2;
+    font-size:1rem;
+    margin:0;
+  }
+
+  /* ---------- Summary signpost bar ---------- */
+  .summary-wrap{
+    max-width:1080px;
+    margin:-40px auto 0;
+    padding:0 24px;
+    position:relative;
+    z-index:2;
+  }
+  .summary-bar{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:16px;
+  }
+  .signpost{
+    background:var(--card);
+    border:1px solid var(--line);
+    box-shadow:var(--shadow);
+    padding:18px 30px 18px 22px;
+    clip-path:polygon(0 0, 88% 0, 100% 50%, 88% 100%, 0 100%);
+    display:flex;flex-direction:column;gap:4px;
+  }
+  .signpost .stat-value{
+    font-family:'Fraunces',serif;
+    font-weight:600;
+    font-size:1.7rem;
+    color:var(--pine);
+    line-height:1;
+  }
+  .signpost .stat-value .unit{
+    font-family:'JetBrains Mono',monospace;
+    font-size:.9rem;
+    font-weight:500;
+    color:var(--ink-soft);
+    margin-left:4px;
+  }
+  .signpost .stat-label{
+    font-family:'JetBrains Mono',monospace;
+    font-size:.68rem;
+    letter-spacing:.1em;
+    text-transform:uppercase;
+    color:var(--ink-soft);
+  }
+
+  /* ---------- Main layout ---------- */
+  main{
+    max-width:1080px;
+    margin:0 auto;
+    padding:36px 24px 80px;
+  }
+
+  .panel{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    box-shadow:var(--shadow);
+    padding:26px;
+    margin-bottom:28px;
+  }
+  .panel h2{
+    font-family:'Fraunces',serif;
+    font-weight:600;
+    font-size:1.35rem;
+    margin:0 0 4px;
+    color:var(--pine);
+  }
+  .panel .panel-sub{
+    margin:0 0 20px;
+    color:var(--ink-soft);
+    font-size:.9rem;
+  }
+
+  /* ---------- Form ---------- */
+  form#trail-form{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:18px 20px;
+  }
+  .field{display:flex;flex-direction:column;gap:6px;}
+  .field.full{grid-column:1/-1;}
+  .field label{
+    font-size:.78rem;
+    font-weight:600;
+    letter-spacing:.02em;
+    color:var(--pine);
+  }
+  .field .req{color:var(--rust);}
+  .field input[type=text],
+  .field input[type=number],
+  .field input[type=date],
+  .field select,
+  .field textarea{
+    font-family:'Inter',sans-serif;
+    font-size:.95rem;
+    padding:10px 12px;
+    border:1px solid var(--line);
+    border-radius:8px;
+    background:#fff;
+    color:var(--ink);
+    outline-offset:2px;
+  }
+  .field input:focus-visible,
+  .field select:focus-visible,
+  .field textarea:focus-visible{
+    outline:2px solid var(--moss);
+  }
+  .field textarea{resize:vertical;min-height:78px;font-family:'Inter',sans-serif;}
+  .field.invalid input,
+  .field.invalid select,
+  .field.invalid textarea{
+    border-color:var(--error);
+    background:#FBF3F3;
+  }
+  .error-text{
+    font-size:.78rem;
+    color:var(--error);
+    display:none;
+    align-items:center;
+    gap:5px;
+  }
+  .field.invalid .error-text{display:flex;}
+
+  .distance-row{display:flex;gap:8px;}
+  .distance-row input{flex:1;min-width:0;}
+  .distance-row select{width:90px;flex-shrink:0;}
+
+  /* difficulty pill radios */
+  .diff-choices{display:flex;gap:8px;}
+  .diff-choice{position:relative;flex:1;}
+  .diff-choice input{position:absolute;opacity:0;inset:0;cursor:pointer;}
+  .diff-choice span{
+    display:block;text-align:center;
+    padding:9px 6px;
+    border:1.5px solid var(--line);
+    border-radius:8px;
+    font-size:.85rem;font-weight:600;
+    color:var(--ink-soft);
+    background:#fff;
+    transition:transform .12s ease;
+  }
+  .diff-choice input:checked + span{color:#fff;border-color:transparent;}
+  .diff-choice[data-diff="Mudah"] input:checked + span{background:var(--moss);}
+  .diff-choice[data-diff="Sedang"] input:checked + span{background:var(--amber);}
+  .diff-choice[data-diff="Sulit"] input:checked + span{background:var(--rust);}
+  .diff-choice input:focus-visible + span{outline:2px solid var(--pine);outline-offset:2px;}
+  .diff-choice input:checked + span{transform:translateY(-1px);}
+
+  /* star input */
+  .star-input{display:flex;gap:4px;}
+  .star-input button{
+    background:none;border:none;cursor:pointer;
+    font-size:1.5rem;line-height:1;padding:2px;
+    color:var(--line);
+  }
+  .star-input button.filled{color:var(--amber);}
+  .star-input button:focus-visible{outline:2px solid var(--moss);border-radius:4px;}
+
+  .form-actions{
+    grid-column:1/-1;
+    display:flex;justify-content:flex-end;gap:12px;margin-top:4px;
+  }
+  .btn{
+    font-weight:600;font-size:.92rem;
+    padding:11px 26px;
+    border:none;cursor:pointer;
+    border-radius:8px;
+    transition:filter .12s ease, transform .12s ease;
+  }
+  .btn:active{transform:translateY(1px);}
+  .btn-primary{
+    background:var(--rust);color:#fff;
+    clip-path:polygon(0 0, 90% 0, 100% 50%, 90% 100%, 0 100%);
+    padding-right:34px;
+  }
+  .btn-primary:hover{filter:brightness(1.08);}
+
+  /* ---------- Filters ---------- */
+  .filter-row{
+    display:flex;align-items:center;flex-wrap:wrap;
+    gap:10px;margin-bottom:18px;
+  }
+  .filter-row .filter-label{
+    font-family:'JetBrains Mono',monospace;
+    font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;
+    color:var(--ink-soft);margin-right:4px;
+  }
+  .filter-btn{
+    border:1.5px solid var(--line);
+    background:#fff;
+    color:var(--ink-soft);
+    font-size:.85rem;font-weight:600;
+    padding:7px 16px;
+    border-radius:999px;
+    cursor:pointer;
+  }
+  .filter-btn[data-active="true"]{
+    color:#fff;border-color:transparent;
+  }
+  .filter-btn[data-filter="Semua"][data-active="true"]{background:var(--pine);}
+  .filter-btn[data-filter="Mudah"][data-active="true"]{background:var(--moss);}
+  .filter-btn[data-filter="Sedang"][data-active="true"]{background:var(--amber);}
+  .filter-btn[data-filter="Sulit"][data-active="true"]{background:var(--rust);}
+
+  .count-note{color:var(--ink-soft);font-size:.85rem;margin-left:auto;}
+
+  /* ---------- Trail cards ---------- */
+  .trail-list{
+    display:grid;
+    grid-template-columns:repeat(auto-fill, minmax(300px,1fr));
+    gap:18px;
+  }
+  .trail-card{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-left:5px solid var(--moss);
+    border-radius:var(--radius);
+    box-shadow:var(--shadow);
+    padding:18px 18px 16px;
+    display:flex;flex-direction:column;gap:10px;
+    animation:cardIn .28s ease both;
+  }
+  .trail-card[data-diff="Sedang"]{border-left-color:var(--amber);}
+  .trail-card[data-diff="Sulit"]{border-left-color:var(--rust);}
+
+  @keyframes cardIn{
+    from{opacity:0;transform:translateY(6px);}
+    to{opacity:1;transform:translateY(0);}
+  }
+
+  .card-top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;}
+  .card-name{
+    font-family:'Fraunces',serif;font-weight:600;
+    font-size:1.15rem;color:var(--pine);margin:0;
+  }
+  .card-loc{font-size:.83rem;color:var(--ink-soft);margin:2px 0 0;}
+
+  .diff-badge{
+    flex-shrink:0;
+    font-size:.7rem;font-weight:700;letter-spacing:.03em;
+    color:#fff;padding:4px 10px 4px 12px;
+    clip-path:polygon(0 0, 85% 0, 100% 50%, 85% 100%, 0 100%);
+  }
+  .diff-badge[data-diff="Mudah"]{background:var(--moss);}
+  .diff-badge[data-diff="Sedang"]{background:var(--amber);}
+  .diff-badge[data-diff="Sulit"]{background:var(--rust);}
+
+  .card-stats{
+    display:flex;gap:16px;flex-wrap:wrap;
+    font-family:'JetBrains Mono',monospace;
+    font-size:.78rem;color:var(--ink-soft);
+  }
+  .card-stats b{color:var(--ink);font-weight:600;}
+
+  .card-stars{color:var(--amber);letter-spacing:2px;font-size:1rem;}
+  .card-stars .empty{color:var(--line);}
+
+  .card-notes{
+    font-size:.87rem;color:var(--ink);
+    background:var(--parchment);
+    border-radius:6px;
+    padding:10px 12px;
+    white-space:pre-wrap;
+    max-height:120px;overflow-y:auto;
+  }
+
+  .card-bottom{
+    display:flex;justify-content:flex-end;align-items:center;gap:8px;
+    margin-top:2px;
+  }
+  .icon-btn{
+    background:none;border:1px solid var(--line);
+    color:var(--ink-soft);
+    font-size:.8rem;font-weight:600;
+    padding:6px 12px;border-radius:6px;
+    cursor:pointer;display:flex;align-items:center;gap:6px;
+  }
+  .icon-btn:hover{border-color:var(--error);color:var(--error);}
+  .confirm-row{display:flex;gap:6px;align-items:center;font-size:.82rem;}
+  .confirm-row span{color:var(--error);font-weight:600;}
+  .confirm-row button{
+    border:none;border-radius:6px;padding:6px 12px;
+    font-size:.78rem;font-weight:600;cursor:pointer;
+  }
+  .confirm-yes{background:var(--error);color:#fff;}
+  .confirm-no{background:var(--parchment-dark);color:var(--ink);}
+
+  /* ---------- Empty state ---------- */
+  .empty-state{
+    text-align:center;
+    padding:56px 20px;
+    color:var(--ink-soft);
+  }
+  .empty-state .emoji{font-size:2.4rem;display:block;margin-bottom:10px;}
+  .empty-state h3{
+    font-family:'Fraunces',serif;color:var(--pine);
+    margin:0 0 6px;font-weight:600;
+  }
+  .empty-state p{margin:0;font-size:.92rem;}
+
+  /* ---------- Toast ---------- */
+  #toast{
+    position:fixed;left:50%;bottom:26px;transform:translate(-50%,20px);
+    background:var(--pine);color:#fff;
+    padding:12px 22px;border-radius:8px;
+    font-size:.88rem;font-weight:500;
+    box-shadow:0 8px 24px rgba(0,0,0,.25);
+    opacity:0;pointer-events:none;
+    transition:opacity .2s ease, transform .2s ease;
+    z-index:50;
+    max-width:90vw;
+  }
+  #toast.show{opacity:1;transform:translate(-50%,0);pointer-events:auto;}
+  #toast.error{background:var(--error);}
+
+  footer.page-footer{
+    text-align:center;color:var(--ink-soft);
+    font-size:.78rem;padding:0 24px 40px;
+    font-family:'JetBrains Mono',monospace;
+  }
+
+  @media (max-width:720px){
+    .summary-bar{grid-template-columns:1fr;}
+    form#trail-form{grid-template-columns:1fr;}
+    .diff-choices{flex-wrap:wrap;}
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:.001ms !important;transition-duration:.001ms !important;}
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="hero-inner">
+    <div class="eyebrow"><span class="dot"></span>catatan pribadi &middot; luar ruangan</div>
+    <h1 class="title">Buku Catatan Jalur Pendakian</h1>
+    <p class="subtitle">Simpan setiap jalur yang sudah kamu taklukkan &mdash; jarak, medan, dan cerita di baliknya &mdash; semua di satu tempat.</p>
+  </div>
+</header>
+
+<div class="summary-wrap">
+  <div class="summary-bar">
+    <div class="signpost">
+      <div class="stat-value" id="stat-total">0</div>
+      <div class="stat-label">Total Jalur Dicatat</div>
+    </div>
+    <div class="signpost">
+      <div class="stat-value" id="stat-distance">0<span class="unit">km</span></div>
+      <div class="stat-label">Total Jarak Ditempuh</div>
+    </div>
+    <div class="signpost">
+      <div class="stat-value" id="stat-rating">&mdash;</div>
+      <div class="stat-label">Rata-rata Peringkat</div>
+    </div>
+  </div>
+</div>
+
+<main>
+  <section class="panel">
+    <h2>Tambah Jalur Baru</h2>
+    <p class="panel-sub">Catat pendakianmu selagi masih segar di ingatan.</p>
+    <form id="trail-form" novalidate>
+      <div class="field" data-field="name">
+        <label for="f-name">Nama Jalur <span class="req">*</span></label>
+        <input type="text" id="f-name" maxlength="80" placeholder="mis. Gunung Papandayan">
+        <span class="error-text">⚠ Nama jalur wajib diisi.</span>
+      </div>
+
+      <div class="field" data-field="location">
+        <label for="f-location">Lokasi (Kota/Wilayah) <span class="req">*</span></label>
+        <input type="text" id="f-location" maxlength="80" placeholder="mis. Garut, Jawa Barat">
+        <span class="error-text">⚠ Lokasi wajib diisi.</span>
+      </div>
+
+      <div class="field" data-field="distance">
+        <label for="f-distance">Jarak <span class="req">*</span></label>
+        <div class="distance-row">
+          <input type="number" id="f-distance" min="0" step="0.1" placeholder="mis. 8.5">
+          <select id="f-unit">
+            <option value="km">km</option>
+            <option value="mi">mi</option>
+          </select>
+        </div>
+        <span class="error-text">⚠ Masukkan jarak lebih dari 0.</span>
+      </div>
+
+      <div class="field" data-field="date">
+        <label for="f-date">Tanggal Mendaki <span class="req">*</span></label>
+        <input type="date" id="f-date">
+        <span class="error-text" id="date-error">⚠ Tanggal wajib diisi dan tidak boleh di masa depan.</span>
+      </div>
+
+      <div class="field full" data-field="difficulty">
+        <label>Tingkat Kesulitan <span class="req">*</span></label>
+        <div class="diff-choices">
+          <label class="diff-choice" data-diff="Mudah">
+            <input type="radio" name="difficulty" value="Mudah">
+            <span>Mudah</span>
+          </label>
+          <label class="diff-choice" data-diff="Sedang">
+            <input type="radio" name="difficulty" value="Sedang">
+            <span>Sedang</span>
+          </label>
+          <label class="diff-choice" data-diff="Sulit">
+            <input type="radio" name="difficulty" value="Sulit">
+            <span>Sulit</span>
+          </label>
+        </div>
+        <span class="error-text">⚠ Pilih salah satu tingkat kesulitan.</span>
+      </div>
+
+      <div class="field full" data-field="rating">
+        <label>Peringkat <span class="req">*</span></label>
+        <div class="star-input" id="star-input" role="group" aria-label="Peringkat bintang">
+          <button type="button" data-value="1">★</button>
+          <button type="button" data-value="2">★</button>
+          <button type="button" data-value="3">★</button>
+          <button type="button" data-value="4">★</button>
+          <button type="button" data-value="5">★</button>
+        </div>
+        <span class="error-text">⚠ Beri peringkat minimal 1 bintang.</span>
+      </div>
+
+      <div class="field full" data-field="notes">
+        <label for="f-notes">Catatan Pribadi</label>
+        <textarea id="f-notes" maxlength="500" placeholder="Pemandangan, satwa liar yang terlihat, tips untuk pendaki lain..."></textarea>
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary">Simpan Jalur</button>
+      </div>
+    </form>
+  </section>
+
+  <section class="panel">
+    <h2>Jalur Tersimpan</h2>
+    <p class="panel-sub">Gulir untuk melihat semua pendakianmu, atau saring berdasarkan tingkat kesulitan.</p>
+
+    <div class="filter-row">
+      <span class="filter-label">Saring:</span>
+      <button class="filter-btn" data-filter="Semua" data-active="true">Semua</button>
+      <button class="filter-btn" data-filter="Mudah">Mudah</button>
+      <button class="filter-btn" data-filter="Sedang">Sedang</button>
+      <button class="filter-btn" data-filter="Sulit">Sulit</button>
+      <span class="count-note" id="count-note"></span>
+    </div>
+
+    <div class="trail-list" id="trail-list"></div>
+  </section>
+</main>
+
+<footer class="page-footer">disimpan otomatis di perangkat ini</footer>
+
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function(){
+  "use strict";
+
+  var STORAGE_KEY = "hikingTrailLogEntries";
+  var MI_TO_KM = 1.60934;
+
+  var state = {
+    trails: [],
+    filter: "Semua",
+    selectedRating: 0,
+    confirmingDeleteId: null
+  };
+
+  var todayStr = new Date().toISOString().slice(0,10);
+  document.getElementById("f-date").setAttribute("max", todayStr);
+
+  /* ---------------- Storage ---------------- */
+  function loadTrails(){
+    try{
+      var raw = localStorage.getItem(STORAGE_KEY);
+      if(!raw) return [];
+      var parsed = JSON.parse(raw);
+      if(!Array.isArray(parsed)) return [];
+      return parsed.filter(isValidTrail);
+    }catch(err){
+      console.error("Gagal membaca data tersimpan:", err);
+      showToast("Data tersimpan tidak dapat dibaca. Memulai catatan baru.", true);
+      return [];
+    }
+  }
+
+  function saveTrails(){
+    try{
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state.trails));
+      return true;
+    }catch(err){
+      console.error("Gagal menyimpan data:", err);
+      showToast("Gagal menyimpan catatan. Penyimpanan mungkin penuh.", true);
+      return false;
+    }
+  }
+
+  function isValidTrail(t){
+    return t && typeof t === "object" &&
+      typeof t.id === "string" &&
+      typeof t.name === "string" && t.name.trim().length > 0 &&
+      typeof t.location === "string" && t.location.trim().length > 0 &&
+      typeof t.distance === "number" && t.distance > 0 &&
+      (t.unit === "km" || t.unit === "mi") &&
+      ["Mudah","Sedang","Sulit"].indexOf(t.difficulty) !== -1 &&
+      typeof t.date === "string" &&
+      typeof t.rating === "number" && t.rating >= 1 && t.rating <= 5;
+  }
+
+  /* ---------------- Helpers ---------------- */
+  function toKm(distance, unit){
+    return unit === "mi" ? distance * MI_TO_KM : distance;
+  }
+
+  function isFutureDate(dateStr){
+    if(!dateStr) return false;
+    return dateStr > todayStr;
+  }
+
+  function isValidDateString(dateStr){
+    if(!dateStr) return false;
+    if(!/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) return false;
+    if(isFutureDate(dateStr)) return false;
+    return true;
+  }
+
+  function formatDate(dateStr){
+    var parts = dateStr.split("-");
+    var d = new Date(Number(parts[0]), Number(parts[1])-1, Number(parts[2]));
+    return d.toLocaleDateString("id-ID", { day:"numeric", month:"long", year:"numeric" });
+  }
+
+  function escapeHtml(str){
+    var div = document.createElement("div");
+    div.textContent = str;
+    return div.innerHTML;
+  }
+
+  function starString(rating){
+    var filled = "★".repeat(rating);
+    var empty = '<span class="empty">' + "★".repeat(5-rating) + "</span>";
+    return filled + empty;
+  }
+
+  function showToast(msg, isError){
+    var toast = document.getElementById("toast");
+    toast.textContent = msg;
+    toast.className = isError ? "show error" : "show";
+    clearTimeout(showToast._t);
+    showToast._t = setTimeout(function(){
+      toast.className = toast.className.replace("show","");
+    }, 3200);
+  }
+
+  /* ---------------- Rendering ---------------- */
+  function renderSummary(){
+    var total = state.trails.length;
+    var totalKm = 0;
+    var ratingSum = 0;
+    state.trails.forEach(function(t){
+      totalKm += toKm(t.distance, t.unit);
+      ratingSum += t.rating;
+    });
+    var totalMi = totalKm / MI_TO_KM;
+
+    document.getElementById("stat-total").textContent = total;
+
+    var distEl = document.getElementById("stat-distance");
+    if(total === 0){
+      distEl.innerHTML = '0<span class="unit">km</span>';
+    }else{
+      distEl.innerHTML = totalKm.toFixed(1) + '<span class="unit">km &middot; ' + totalMi.toFixed(1) + ' mi</span>';
+    }
+
+    var ratingEl = document.getElementById("stat-rating");
+    ratingEl.textContent = total === 0 ? "—" : (ratingSum/total).toFixed(1) + " / 5";
+  }
+
+  function getFilteredTrails(){
+    var list = state.trails.slice().sort(function(a,b){
+      return b.date.localeCompare(a.date);
+    });
+    if(state.filter === "Semua") return list;
+    return list.filter(function(t){ return t.difficulty === state.filter; });
+  }
+
+  function renderList(){
+    var container = document.getElementById("trail-list");
+    var filtered = getFilteredTrails();
+
+    document.getElementById("count-note").textContent =
+      state.trails.length === 0 ? "" :
+      "Menampilkan " + filtered.length + " dari " + state.trails.length + " jalur";
+
+    if(filtered.length === 0){
+      container.innerHTML = state.trails.length === 0
+        ? '<div class="empty-state" style="grid-column:1/-1">' +
+            '<span class="emoji">🥾</span>' +
+            '<h3>Belum ada jalur yang dicatat</h3>' +
+            '<p>Mulai petualanganmu &mdash; isi formulir di atas untuk mencatat pendakian pertamamu.</p>' +
+          '</div>'
+        : '<div class="empty-state" style="grid-column:1/-1">' +
+            '<span class="emoji">🔍</span>' +
+            '<h3>Tidak ada jalur untuk filter ini</h3>' +
+            '<p>Coba pilih tingkat kesulitan lain, atau tambahkan jalur baru.</p>' +
+          '</div>';
+      return;
+    }
+
+    container.innerHTML = filtered.map(renderCard).join("");
+  }
+
+  function renderCard(t){
+    var isConfirming = state.confirmingDeleteId === t.id;
+    var actions = isConfirming
+      ? '<div class="confirm-row">' +
+          '<span>Hapus jalur ini?</span>' +
+          '<button type="button" class="confirm-yes" data-action="confirm-delete" data-id="' + t.id + '">Ya, hapus</button>' +
+          '<button type="button" class="confirm-no" data-action="cancel-delete">Batal</button>' +
+        '</div>'
+      : '<button type="button" class="icon-btn" data-action="ask-delete" data-id="' + t.id + '">🗑 Hapus</button>';
+
+    return (
+      '<article class="trail-card" data-diff="' + t.difficulty + '">' +
+        '<div class="card-top">' +
+          '<div>' +
+            '<p class="card-name">' + escapeHtml(t.name) + '</p>' +
+            '<p class="card-loc">' + escapeHtml(t.location) + '</p>' +
+          '</div>' +
+          '<span class="diff-badge" data-diff="' + t.difficulty + '">' + t.difficulty + '</span>' +
+        '</div>' +
+        '<div class="card-stats">' +
+          '<span><b>' + t.distance + ' ' + t.unit + '</b> jarak</span>' +
+          '<span><b>' + formatDate(t.date) + '</b></span>' +
+        '</div>' +
+        '<div class="card-stars" aria-label="Peringkat ' + t.rating + ' dari 5">' + starString(t.rating) + '</div>' +
+        (t.notes ? '<div class="card-notes">' + escapeHtml(t.notes) + '</div>' : '') +
+        '<div class="card-bottom">' + actions + '</div>' +
+      '</article>'
+    );
+  }
+
+  function render(){
+    renderSummary();
+    renderList();
+  }
+
+  /* ---------------- Form validation ---------------- */
+  function setFieldError(fieldName, hasError){
+    var el = document.querySelector('.field[data-field="' + fieldName + '"]');
+    if(el) el.classList.toggle("invalid", hasError);
+  }
+
+  function clearAllErrors(){
+    document.querySelectorAll(".field").forEach(function(el){
+      el.classList.remove("invalid");
+    });
+  }
+
+  function readForm(){
+    return {
+      name: document.getElementById("f-name").value.trim(),
+      location: document.getElementById("f-location").value.trim(),
+      distance: parseFloat(document.getElementById("f-distance").value),
+      unit: document.getElementById("f-unit").value,
+      date: document.getElementById("f-date").value,
+      difficulty: (document.querySelector('input[name="difficulty"]:checked') || {}).value,
+      rating: state.selectedRating,
+      notes: document.getElementById("f-notes").value.trim()
+    };
+  }
+
+  function validateForm(data){
+    var valid = true;
+    if(!data.name){ setFieldError("name", true); valid = false; } else setFieldError("name", false);
+    if(!data.location){ setFieldError("location", true); valid = false; } else setFieldError("location", false);
+    if(!(data.distance > 0)){ setFieldError("distance", true); valid = false; } else setFieldError("distance", false);
+    if(!isValidDateString(data.date)){ setFieldError("date", true); valid = false; } else setFieldError("date", false);
+    if(!data.difficulty){ setFieldError("difficulty", true); valid = false; } else setFieldError("difficulty", false);
+    if(!(data.rating >= 1)){ setFieldError("rating", true); valid = false; } else setFieldError("rating", false);
+    return valid;
+  }
+
+  function resetForm(){
+    document.getElementById("trail-form").reset();
+    state.selectedRating = 0;
+    updateStarDisplay();
+    clearAllErrors();
+  }
+
+  /* ---------------- Star input ---------------- */
+  function updateStarDisplay(){
+    document.querySelectorAll("#star-input button").forEach(function(btn){
+      var val = Number(btn.getAttribute("data-value"));
+      btn.classList.toggle("filled", val <= state.selectedRating);
+      btn.setAttribute("aria-pressed", val <= state.selectedRating ? "true" : "false");
+    });
+  }
+
+  document.getElementById("star-input").addEventListener("click", function(e){
+    var btn = e.target.closest("button");
+    if(!btn) return;
+    state.selectedRating = Number(btn.getAttribute("data-value"));
+    updateStarDisplay();
+    setFieldError("rating", false);
+  });
+
+  /* ---------------- Form submit ---------------- */
+  document.getElementById("trail-form").addEventListener("submit", function(e){
+    e.preventDefault();
+    var data = readForm();
+    if(!validateForm(data)){
+      showToast("Periksa kembali kolom yang ditandai merah.", true);
+      return;
+    }
+
+    var trail = {
+      id: (Date.now().toString(36) + Math.random().toString(36).slice(2,8)),
+      name: data.name,
+      location: data.location,
+      distance: data.distance,
+      unit: data.unit,
+      difficulty: data.difficulty,
+      date: data.date,
+      notes: data.notes,
+      rating: data.rating
+    };
+
+    state.trails.push(trail);
+    var ok = saveTrails();
+    resetForm();
+    render();
+    if(ok) showToast("Jalur \"" + trail.name + "\" berhasil disimpan.");
+  });
+
+  /* ---------------- List interactions (delete, filter) ---------------- */
+  document.getElementById("trail-list").addEventListener("click", function(e){
+    var btn = e.target.closest("button[data-action]");
+    if(!btn) return;
+    var action = btn.getAttribute("data-action");
+
+    if(action === "ask-delete"){
+      state.confirmingDeleteId = btn.getAttribute("data-id");
+      renderList();
+    } else if(action === "cancel-delete"){
+      state.confirmingDeleteId = null;
+      renderList();
+    } else if(action === "confirm-delete"){
+      var id = btn.getAttribute("data-id");
+      var removed = state.trails.find(function(t){ return t.id === id; });
+      state.trails = state.trails.filter(function(t){ return t.id !== id; });
+      state.confirmingDeleteId = null;
+      var ok = saveTrails();
+      render();
+      if(ok && removed) showToast("Jalur \"" + removed.name + "\" dihapus.");
+    }
+  });
+
+  document.querySelectorAll(".filter-btn").forEach(function(btn){
+    btn.addEventListener("click", function(){
+      document.querySelectorAll(".filter-btn").forEach(function(b){
+        b.removeAttribute("data-active");
+      });
+      btn.setAttribute("data-active", "true");
+      state.filter = btn.getAttribute("data-filter");
+      renderList();
+    });
+  });
+
+  /* ---------------- Init ---------------- */
+  state.trails = loadTrails();
+  updateStarDisplay();
+  render();
+})();
+</script>
+</body>
+</html>
